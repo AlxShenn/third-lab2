@@ -1,0 +1,34 @@
+#ifndef CUCKOO_HASH_H
+#define CUCKOO_HASH_H
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+template <typename T>
+class CuckooHash {
+private:
+    struct Entry {
+        T key;
+        bool occupied;
+        Entry() : occupied(false) {}
+    };
+    
+    vector<Entry> table1;
+    vector<Entry> table2;
+    size_t capacity;
+    size_t size;
+
+    size_t hash1(const T& key) const;
+    size_t hash2(const T& key) const;
+    void rehash();
+
+public:
+    CuckooHash(size_t cap = 100);
+    void add(const T& key);
+    bool contains(const T& key) const;
+};
+
+#endif
