@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <cctype>
 #include "structures/lfuCache.h"
 
 using namespace std;
@@ -38,7 +39,9 @@ int main() {
         string cmd;
         if (!(iss >> cmd)) continue;
 
-        for (char& c : cmd) c = toupper(c);
+        for (size_t i = 0; i < cmd.length(); ++i) {
+            cmd[i] = toupper(cmd[i]);
+        }
 
         if (cmd == "EXIT") {
             cout << "Hooray!!" << endl;

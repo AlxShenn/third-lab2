@@ -1,5 +1,6 @@
 #include <iostream>
-#include "structures/hashset.h"
+#include <string>
+#include "structures/hashSet.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ int main() {
         int a, b;
         cin >> a >> b;
 
-        if (a + b + 1 == N) {
+        if (a >= 0 && b >= 0 && a + b + 1 == N) {
             validClaims.add(to_string(a) + "_" + to_string(b));
         }
     }

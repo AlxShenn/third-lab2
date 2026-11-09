@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "structures/hashset.h"
+#include "structures/hashSet.h"
 #include "structures/cuckooHash.h"
 
 using namespace std;
@@ -16,16 +16,18 @@ bool areIsomorphicChaining(const string& a, const string& b) {
         string sB(1, b[i]);
         
         string mapping = sA + "->" + sB;
-        string reverseMapping = sB + "->" + sA;
 
-        if (mapAB.contains(mapping) && mapBA.contains(reverseMapping)) {
+        if (mapAB.contains(mapping)) {
             continue;
-        } else if (!mapAB.contains(mapping) && !mapBA.contains(reverseMapping)) {
-            mapAB.add(mapping);
-            mapBA.add(reverseMapping);
-        } else {
+        }
+
+        if (mapAB.contains(sA) || mapBA.contains(sB)) {
             return false;
         }
+
+        mapAB.add(mapping);
+        mapAB.add(sA);
+        mapBA.add(sB);
     }
     return true;
 }
@@ -41,22 +43,24 @@ bool areIsomorphicCuckoo(const string& a, const string& b) {
         string sB(1, b[i]);
         
         string mapping = sA + "->" + sB;
-        string reverseMapping = sB + "->" + sA;
 
-        if (mapAB.contains(mapping) && mapBA.contains(reverseMapping)) {
+        if (mapAB.contains(mapping)) {
             continue;
-        } else if (!mapAB.contains(mapping) && !mapBA.contains(reverseMapping)) {
-            mapAB.add(mapping);
-            mapBA.add(reverseMapping);
-        } else {
+        }
+        
+        if (mapAB.contains(sA) || mapBA.contains(sB)) {
             return false;
         }
+
+        mapAB.add(mapping);
+        mapAB.add(sA);
+        mapBA.add(sB);
     }
     return true;
 }
 
 int main() {
-    cout << "=== Isomorphic Strings (Two Methods) ===" << endl;
+    cout << " Isomorphic Strings " << endl;
     
     string a, b;
     cout << "Enter string A: ";

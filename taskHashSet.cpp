@@ -1,24 +1,23 @@
 #include <iostream>
 #include <sstream>
-#include <map>
 #include <string>
 #include <cctype>
 
-#include "structures/hashset.h"
+#include "structures/hashSet.h"
+#include "structures/slist.h" 
 #include "structures/storage.h"
 
 using namespace std;
 
 void printHelp() {
-    cout << "=== Hash Set Manager ===" << endl;
+    cout << " Hash Set " << endl;
     cout << "Available commands:" << endl;
     cout << "  SETADD <set_name> <value>  - add element to set" << endl;
     cout << "  SETDEL <set_name> <value>  - remove element from set" << endl;
     cout << "  SET_AT <set_name> <value>  - check if element is in set" << endl;
     cout << "  HELP                       - show this message" << endl;
     cout << "  EXIT                       - save and quit" << endl;
-    cout << "Example: SETADD set1 apple" << endl;
-    cout << "=========================" << endl;
+    cout << "Example: SETADD set1 apple" << endl << endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -34,18 +33,16 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    map<string, HashSet<string>*> sets;
+    Slist sets;
+    FInitializeSlist(sets);
+    
     LoadSets(file, sets);
 
-    // Single query mode
     if (!query.empty()) {
         istringstream iss(query);
         string cmd, setName, val;
         if (iss >> cmd >> setName >> val) {
-            if (sets.find(setName) == sets.end()) {
-                sets[setName] = new HashSet<string>();
-            }
-            HashSet<string>* s = sets[setName];
+            HashSet<string>* s = FGetOrCreateSet(sets, setName);
             
             if (cmd == "SETADD") {
                 s->add(val);
@@ -63,7 +60,7 @@ int main(int argc, char* argv[]) {
             cout << "Invalid query format. Use: SETADD <name> <value>" << endl;
         }
     } 
-    // Interactive mode
+
     else {
         printHelp();
         
@@ -77,9 +74,10 @@ int main(int argc, char* argv[]) {
             istringstream iss(line);
             string cmd, setName, val;
             if (!(iss >> cmd)) continue;
-            
-            // Convert command to uppercase
-            for (char& c : cmd) c = toupper(c);
+
+            for (size_t i = 0; i < cmd.length(); ++i) {
+                cmd[i] = toupper(cmd[i]);
+            }
             
             if (cmd == "EXIT") {
                 break;
@@ -93,10 +91,7 @@ int main(int argc, char* argv[]) {
                 continue;
             }
             
-            if (sets.find(setName) == sets.end()) {
-                sets[setName] = new HashSet<string>();
-            }
-            HashSet<string>* s = sets[setName];
+            HashSet<string>* s = FGetOrCreateSet(sets, setName);
             
             if (cmd == "SETADD") {
                 s->add(val);
@@ -114,11 +109,8 @@ int main(int argc, char* argv[]) {
     }
     
     SaveSets(file, sets);
-
-    for (auto& pair : sets) {
-        delete pair.second;
-    }
+    FFree(sets);
     
-    cout << "Saved to " << file << ". Exiting." << endl;
+    cout << "Saved to " << file << ". Exiting. Hooray!" << endl;
     return 0;
 }

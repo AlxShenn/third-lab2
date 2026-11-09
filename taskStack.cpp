@@ -36,7 +36,7 @@ int main() {
                 else if (token == "*") res = op2 * op1;
                 else if (token == "/") {
                     if (op1 == 0) {
-                        cout << "Ошибка: деление на ноль!" << endl;
+                        cout << "Cannot / 0!" << endl;
                         error = true;
                         break;
                     }
@@ -61,11 +61,11 @@ int main() {
             cout << "Expression doesn't have enough operandes." << endl;
         }
 
-        cout << "Continue?? (y/n) : ";
+        cout << "Continue?? (Enter n to exit!): ";
         getline(cin, choice);
         
         if (choice == "n") break;
     }
-    cout << "Hooray!";
+    cout << "Hooray!" << endl;
     return 0;
 }
