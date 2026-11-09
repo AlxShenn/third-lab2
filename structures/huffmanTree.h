@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "array.h" 
+#include "dlist.h"
 
 using namespace std;
 

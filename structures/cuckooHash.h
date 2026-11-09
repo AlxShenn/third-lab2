@@ -2,8 +2,8 @@
 #define CUCKOO_HASH_H
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <functional>
 
 using namespace std;
 
@@ -16,8 +16,8 @@ private:
         Entry() : occupied(false) {}
     };
     
-    vector<Entry> table1;
-    vector<Entry> table2;
+    Entry* table1;
+    Entry* table2;
     size_t capacity;
     size_t size;
 
@@ -27,6 +27,7 @@ private:
 
 public:
     CuckooHash(size_t cap = 100);
+    ~CuckooHash();
     void add(const T& key);
     bool contains(const T& key) const;
 };

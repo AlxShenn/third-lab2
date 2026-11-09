@@ -56,3 +56,8 @@ void Array::print() const {
     }
     cout << "\n";
 }
+
+void Array::set(size_t index, const string& text) {
+    if (index >= size) return;
+    data[index] = text;
+}

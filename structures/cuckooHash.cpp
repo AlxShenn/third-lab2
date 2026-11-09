@@ -12,24 +12,34 @@ size_t CuckooHash<T>::hash2(const T& key) const {
 
 template <typename T>
 void CuckooHash<T>::rehash() {
-    vector<Entry> old1 = table1;
-    vector<Entry> old2 = table2;
+    Entry* old1 = table1;
+    Entry* old2 = table2;
+    size_t oldCapacity = capacity;
     
     capacity *= 2;
-    table1.assign(capacity, Entry());
-    table2.assign(capacity, Entry());
+    table1 = new Entry[capacity];
+    table2 = new Entry[capacity];
     size = 0;
     
-    for (size_t i = 0; i < old1.size(); ++i) {
+    for (size_t i = 0; i < oldCapacity; ++i) {
         if (old1[i].occupied) add(old1[i].key);
         if (old2[i].occupied) add(old2[i].key);
     }
+
+    delete[] old1;
+    delete[] old2;
 }
 
 template <typename T>
 CuckooHash<T>::CuckooHash(size_t cap) : capacity(cap), size(0) {
-    table1.assign(capacity, Entry());
-    table2.assign(capacity, Entry());
+    table1 = new Entry[capacity];
+    table2 = new Entry[capacity];
+}
+
+template <typename T>
+CuckooHash<T>::~CuckooHash() {
+    delete[] table1;
+    delete[] table2;
 }
 
 template <typename T>

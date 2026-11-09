@@ -7,12 +7,16 @@ size_t HashSet<T>::hash(const T& key) const {
 
 template <typename T>
 HashSet<T>::HashSet(size_t cap) : capacity(cap), size(0) {
-    table.resize(capacity, nullptr);
+    table = new Node*[capacity];
+    for (size_t i = 0; i < capacity; ++i) {
+        table[i] = nullptr;
+    }
 }
 
 template <typename T>
 HashSet<T>::~HashSet() { 
     free(); 
+    delete[] table; 
 }
 
 template <typename T>
@@ -75,12 +79,16 @@ template <typename T>
 size_t HashSet<T>::getSize() const { return size; }
 
 template <typename T>
-vector<T> HashSet<T>::getAll() const {
-    vector<T> result;
+T* HashSet<T>::getAll() const {
+    if (size == 0) return nullptr;
+
+    T* result = new T[size];
+    size_t index = 0;
+
     for (size_t i = 0; i < capacity; ++i) {
         Node* cur = table[i];
         while (cur) {
-            result.push_back(cur->data);
+            result[index++] = cur->data;
             cur = cur->next;
         }
     }

@@ -4,29 +4,35 @@
 
 using namespace std;
 
-void SaveSets(const string& filename, map<string, HashSet<string>*>& sets) {
+void SaveSets(const string& filename, Slist& sets) {
     ofstream f(filename);
     if (!f) return;
-
-    for (auto& pair : sets) {
-        string name = pair.first;
-        HashSet<string>* s = pair.second;
-        vector<string> elements = s->getAll();
-        for (const string& val : elements) {
-            f << name << " " << val << "\n";
+    SlistNode* current = sets.head;
+    while (current != nullptr) {
+        string name = current->text;
+        HashSet<string>* s = current->set;
+        
+        if (s != nullptr) {
+            size_t count = s->getSize();
+            string* elements = s->getAll();
+            
+            for (size_t i = 0; i < count; ++i) {
+                f << name << " " << elements[i] << "\n";
+            }
+            
+            delete[] elements;
         }
+        current = current->next;
     }
 }
 
-void LoadSets(const string& filename, map<string, HashSet<string>*>& sets) {
+void LoadSets(const string& filename, Slist& sets) {
     ifstream f(filename);
     if (!f) return;
 
     string setName, val;
     while (f >> setName >> val) {
-        if (sets.find(setName) == sets.end()) {
-            sets[setName] = new HashSet<string>();
-        }
-        sets[setName]->add(val);
+        HashSet<string>* s = FGetOrCreateSet(sets, setName);
+        s->add(val);
     }
 }

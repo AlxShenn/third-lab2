@@ -24,6 +24,7 @@ public:
     void removeIndex(size_t index);
     size_t length() const;
     void print() const;
+    void set(size_t index, const string& text);
 };
 
 #endif

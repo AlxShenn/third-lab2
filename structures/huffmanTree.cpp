@@ -1,5 +1,4 @@
 #include "huffmanTree.h"
-#include <vector>
 
 HuffmanCoder::HuffmanCoder() : root(nullptr) {}
 
@@ -14,7 +13,6 @@ void HuffmanCoder::deleteTree(HuffmanNode* node) {
     delete node;
 }
 
-// Поиск индекса символа в нашем Array
 int findCharIndex(const Array& arr, char c) {
     for (size_t i = 0; i < arr.length(); ++i) {
         if (arr.get(i)[0] == c) return (int)i;
@@ -43,57 +41,81 @@ void HuffmanCoder::buildTree(const string& text) {
     if (text.empty()) return;
 
     Array uniqueChars;
-    vector<int> freqs;
+    Array freqsStr;
 
-    for (char c : text) {
+    for (size_t i = 0; i < text.length(); ++i) {
+        char c = text[i];
         int idx = findCharIndex(uniqueChars, c);
         if (idx == -1) {
             uniqueChars.addEnd(string(1, c));
-            freqs.push_back(1);
+            freqsStr.addEnd("1");
         } else {
-            freqs[idx]++;
+            int currentFreq = stoi(freqsStr.get(idx));
+            freqsStr.set(idx, to_string(currentFreq + 1));
         }
     }
 
-    vector<HuffmanNode*> nodes;
+    Array nodesPool;
+    Dlist freqList;
+    DInitialize(freqList);
+
     for (size_t i = 0; i < uniqueChars.length(); ++i) {
-        nodes.push_back(new HuffmanNode(uniqueChars.get(i)[0], freqs[i]));
+        HuffmanNode* newNode = new HuffmanNode(uniqueChars.get(i)[0], stoi(freqsStr.get(i)));
+        nodesPool.addEnd(to_string(reinterpret_cast<uintptr_t>(newNode)));
+        DPushTail(freqList, freqsStr.get(i));
     }
 
-    while (nodes.size() > 1) {
-        int min1 = 0;
-        int min2 = 1;
+    while (freqList.head != nullptr && freqList.head->next != nullptr) {
+        int min1Idx = -1, min2Idx = -1;
+        int min1Freq = 1e9, min2Freq = 1e9;
+        int currentIdx = 0;
 
-        if (nodes[min1]->freq > nodes[min2]->freq) swap(min1, min2);
+        for (DlistNode* cur = freqList.head; cur != nullptr; cur = cur->next) {
+            int f = stoi(cur->text);
+            if (f < min1Freq) {
+                min2Freq = min1Freq;
+                min2Idx = min1Idx;
+                min1Freq = f;
+                min1Idx = currentIdx;
+            } else if (f < min2Freq) {
+                min2Freq = f;
+                min2Idx = currentIdx;
+            }
+            currentIdx++;
+        }
 
-        for (size_t i = 2; i < nodes.size(); ++i) {
-            if (nodes[i]->freq < nodes[min1]->freq) {
-                min2 = min1;
-                min1 = i;
-            } else if (nodes[i]->freq < nodes[min2]->freq) {
-                min2 = i;
+        HuffmanNode* node1 = reinterpret_cast<HuffmanNode*>(stoull(nodesPool.get(min1Idx)));
+        HuffmanNode* node2 = reinterpret_cast<HuffmanNode*>(stoull(nodesPool.get(min2Idx)));
+
+        HuffmanNode* parent = new HuffmanNode('\0', node1->freq + node2->freq);
+        parent->left = node1;
+        parent->right = node2;
+
+        if (min1Idx > min2Idx) swap(min1Idx, min2Idx);
+        
+        nodesPool.set(min1Idx, "0");
+        nodesPool.set(min2Idx, "0");
+
+        DDeleteValue(freqList, to_string(node1->freq));
+        DDeleteValue(freqList, to_string(node2->freq));
+
+        nodesPool.addEnd(to_string(reinterpret_cast<uintptr_t>(parent)));
+        DPushTail(freqList, to_string(parent->freq));
+    }
+
+    if (freqList.head != nullptr) {
+        for (size_t i = 0; i < nodesPool.length(); ++i) {
+            if (nodesPool.get(i) != "0") {
+                root = reinterpret_cast<HuffmanNode*>(stoull(nodesPool.get(i)));
+                break;
             }
         }
-
-        HuffmanNode* left = nodes[min1];
-        HuffmanNode* right = nodes[min2];
-
-        HuffmanNode* parent = new HuffmanNode('\0', left->freq + right->freq);
-        parent->left = left;
-        parent->right = right;
-
-
-        if (min1 > min2) swap(min1, min2);
-        nodes.erase(nodes.begin() + min2);
-        nodes.erase(nodes.begin() + min1);
-        
-        nodes.push_back(parent);
+        if (root) {
+            generateCodes(root, "");
+        }
     }
 
-    if (!nodes.empty()) {
-        root = nodes[0];
-        generateCodes(root, "");
-    }
+    DFree(freqList);
 }
 
 string HuffmanCoder::encode(const string& text) {
