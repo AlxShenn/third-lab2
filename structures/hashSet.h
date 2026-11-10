@@ -1,40 +1,36 @@
-#ifndef HUFFMAN_H
-#define HUFFMAN_H
+#ifndef HASHSET_H
+#define HASHSET_H
 
 #include <iostream>
 #include <string>
-#include "array.h" 
-#include "dlist.h"
+#include <vector>
+#include <functional>
 
 using namespace std;
 
-struct HuffmanNode {
-    char ch;
-    int freq;
-    HuffmanNode* left;
-    HuffmanNode* right;
-
-    HuffmanNode(char character, int frequency) 
-        : ch(character), freq(frequency), left(nullptr), right(nullptr) {}
-};
-
-class HuffmanCoder {
+template <typename T>
+class HashSet {
 private:
-    HuffmanNode* root;
-    Array chars;
-    Array codes;
+    struct Node {
+        T data;
+        Node* next;
+        Node(const T& val, Node* n) : data(val), next(n) {}
+    };
+    vector<Node*> table;
+    size_t capacity;
+    size_t size;
 
-    void generateCodes(HuffmanNode* node, string code);
-    void deleteTree(HuffmanNode* node);
+    size_t hash(const T& key) const;
 
 public:
-    HuffmanCoder();
-    ~HuffmanCoder();
-
-    void buildTree(const string& text);
-    string encode(const string& text);
-    string decode(const string& encodedText);
-    void printCodes() const;
+    HashSet(size_t cap = 1000);
+    ~HashSet();
+    void free();
+    void add(const T& value);
+    bool remove(const T& value);
+    bool contains(const T& value) const;
+    size_t getSize() const;
+    T* HashSet<T>::getAll() const;
 };
 
 #endif
